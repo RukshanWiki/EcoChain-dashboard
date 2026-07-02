@@ -112,13 +112,9 @@ const RegisterModal = ({ show, handleClose, openLogin }) => {
     }
 
     try {
-      // 1. Create a fake email using the farmer's mobile number so it's unique
-      const dummyEmail = `${formData.mobile}@farmer.ecochain.com`;
-
       // 2. Add the dummy email to the payload being sent to the backend
       const payload = { 
-        ...formData,
-        email: dummyEmail 
+        ...formData
       };
       delete payload.confirmPassword;
 
