@@ -54,6 +54,53 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// ✅ LOGIN (Keep your existing login code...)
-// ...
+// ✅ LOGIN
+router.post("/login", async (req, res) => {
+  try {
+    // 1. Look for farmerRegNo instead of nic
+    const { farmerRegNo, password } = req.body;
+
+    if (!farmerRegNo || !password) {
+      return res.status(400).json({ success: false, message: "Please provide both Farmer ID and password." });
+    }
+
+    // 2. Find user by farmerRegNo
+    const user = await User.findOne({ farmerRegNo });
+    if (!user) {
+      return res.status(401).json({ success: false, message: "Invalid Farmer ID or password." });
+    }
+
+    // 3. Compare passwords
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: "Invalid Farmer ID or password." });
+    }
+
+    // 4. Generate JWT Token
+    const token = jwt.sign(
+      { id: user._id, role: user.role, farmerRegNo: user.farmerRegNo },
+      process.env.JWT_SECRET || "your_temporary_secret_key", 
+      { expiresIn: "1d" }
+    );
+
+    // 5. Send success response
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      token,
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        farmerRegNo: user.farmerRegNo,
+        role: user.role,
+        province: user.province,
+        district: user.district
+      }
+    });
+
+  } catch (err) {
+    console.error("❌ Login error:", err);
+    res.status(500).json({ success: false, message: "Server error during login." });
+  }
+});
 export default router;

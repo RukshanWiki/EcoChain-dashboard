@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { Modal, Button, Form, Alert } from "react-bootstrap";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const LoginModal = ({ show, handleClose, setIsLoggedIn, setUserRole }) => {
   const [formData, setFormData] = useState({ farmerRegNo: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -36,6 +39,8 @@ const LoginModal = ({ show, handleClose, setIsLoggedIn, setUserRole }) => {
 
         handleClose();
 
+        navigate("/dashboard");
+     
         // ✅ Redirect to dashboard (optional)
         window.location.href = "/dashboard";
       } else {
